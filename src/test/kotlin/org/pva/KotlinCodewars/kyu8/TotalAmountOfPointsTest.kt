@@ -23,6 +23,13 @@ internal class TotalAmountOfPointsTest {
     @Test
     fun tests() {
         assertArrayEquals(intArrayOf(1, 3, 2, 5, 3), digitize(35231))
+        assertEquals(10, sum(listOf(5,"5")));
+        assertEquals(22, sum(listOf(9, 3, "7", "3")));
+        assertEquals(42, sum(listOf("5", "0", 9, 3, 2, 1, "9", 6, 7)));
+        assertEquals(41, sum(listOf("3", 6, 6, 0, "5", 8, 5, "6", 2, "0")));
+        assertEquals(45, sum(listOf("1", "5", "8", 8, 9, 9, 2, "3")));
+        assertEquals(41, sum(listOf("3", 6, 6, 0, "5", 8, 5, "6", 2, "0")));
+        assertEquals(61, sum(listOf(8, 0, 0, 8, 5, 7, 2, 3, 7, 8, 6, 7)));
     }
 
     private fun printAndAssert(expected: Int, games: List<String>) {

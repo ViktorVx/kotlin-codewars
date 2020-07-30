@@ -12,3 +12,12 @@ fun points(games: List<String>) =
 
 fun digitize(n:Long):IntArray = n.toString().reversed().toCharArray().map { it.toString().toInt() }.toIntArray()
 
+fun sum(mixed: List<Any>): Int =
+        mixed.sumBy {
+            when (it) {
+                is String -> it.toInt()
+                is Int -> it
+                else -> 0
+            }
+        }
+
