@@ -9,3 +9,6 @@ fun points(games: List<String>) =
                 else -> 1
             }
         }
+
+fun digitize(n:Long):IntArray = n.toString().reversed().toCharArray().map { it.toString().toInt() }.toIntArray()
+
