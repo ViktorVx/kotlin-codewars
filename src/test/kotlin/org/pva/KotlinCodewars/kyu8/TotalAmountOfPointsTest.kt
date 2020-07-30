@@ -32,8 +32,18 @@ internal class TotalAmountOfPointsTest {
         assertEquals(61, sum(listOf(8, 0, 0, 8, 5, 7, 2, 3, 7, 8, 6, 7)));
     }
 
+    @Test
+    fun sample() {
+        assertEquals("eating like I",reverseWords("I like eating") )
+        assertEquals("flying like I", reverseWords("I like flying"))
+        assertEquals("nice is world The", reverseWords("The world is nice"))
+        assertEquals("it!! Split Just", reverseWords("Just Split it!!"))
+        assertEquals("!!! !! !", reverseWords("! !! !!!"))
+        assertEquals("7777 777 77 7", reverseWords("7 77 777 7777"))
+        assertEquals("D : Jpazzy", reverseWords("Jpazzy : D"))
+    }
+
     private fun printAndAssert(expected: Int, games: List<String>) {
-        println("Testing for games: $games")
         assertEquals(expected, points(games))
     }
 }

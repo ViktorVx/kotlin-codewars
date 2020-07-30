@@ -21,3 +21,5 @@ fun sum(mixed: List<Any>): Int =
             }
         }
 
+fun reverseWords(s: String): String = s.split(" ").reversed().joinToString(" ", "", "")
+
