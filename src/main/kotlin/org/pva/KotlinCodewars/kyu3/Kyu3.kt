@@ -10,12 +10,12 @@ fun parseRegexp(s: String):String {
         ssRes += if (s in ltrL && ss[i + 1] in ltrR) "$s+" else s
     }
     println(ssRes)
-    return parse(ssRes, Node("", "", "", null, null, null, "")).toString()
+    return parse(ssRes, Node(null, "", "", null, null, null, "")).toString()
 }
 
 fun parse(s: String, parent: Node):Node {
 //    if (s.length == 1) return "Normal(\\'$s\\')"
-    if (s.length == 1) return Node("", "", "", parent , null, null, "Normal(\\'$s\\')")
+    if (s.length == 1) return Node(null, "", "", parent , null, null, "Normal(\\'$s\\')")
     val ltr = listOf('a', 'b', '.', 'N')
     val map = mapOf('*' to 1, '+' to 2, '|' to 3)
     var ind = 0
@@ -40,17 +40,18 @@ fun parse(s: String, parent: Node):Node {
         }
     }
     if (ind == 0) {
-        return parse(s.substring(1, s.length - 1))
+        return parse(s.substring(1, s.length - 1), parent)
     }
     val oper = s[ind]
     val left = s.substring(0, ind)
     val right = s.substring(ind + 1, s.length)
     //===================
     println("oper: $oper, left: $left, right: $right")
-    parse(left)
-    parse(right)
-    return ""
+    val node = Node(oper, left, right, parent, parse(left, ), parse(right), "")
+//    parse(left)
+//    parse(right)
+    return node
 }
 
-class Node(oper: String, leftT: String, rightT: String, parent: Node?, left: Node?, right: Node?, result:String)
+class Node(oper: Char?, leftT: String, rightT: String, parent: Node?, left: Node?, right: Node?, result:String)
 
