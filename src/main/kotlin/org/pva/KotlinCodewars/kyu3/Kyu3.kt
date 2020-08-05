@@ -6,19 +6,16 @@ fun parseRegexp(s: String):String {
     val ltr = listOf('a', 'b', '.')
     var ssRes = ""
     for ((i, s) in ss.toCharArray().iterator().withIndex()) {
-        if (s in ltr && ss[i + 1] in ltr) {
-            ssRes += "$s+"
-        } else {
-            ssRes += s
-        }
+        ssRes += if (s in ltr && ss[i + 1] in ltr) "$s+" else s
     }
     println(ssRes)
     return parse(ssRes)
 }
 
 fun parse(s: String):String {
-    val ltr = listOf('a', 'b', '.')
-    val map = mapOf('*' to 3, '+' to 2, '|' to 1)
+    if (s.length == 1) return "Normal(\\'$s\\')"
+    val ltr = listOf('a', 'b', '.', 'N')
+    val map = mapOf('*' to 1, '+' to 2, '|' to 3)
     var ind = 0
     var w = 0
     var brk = 0
