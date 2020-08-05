@@ -3,20 +3,23 @@ package org.pva.KotlinCodewars.kyu3
 
 fun parseRegexp(s: String):String {
     var ss = s.replace(Regex("\\*"), "*N")
-    val ltr = listOf('a', 'b', '.')
+    val ltrL = listOf('a', 'b', '.')
+    val ltrR = listOf('a', 'b', '.', '(')
     var ssRes = ""
     for ((i, s) in ss.toCharArray().iterator().withIndex()) {
-        ssRes += if (s in ltr && ss[i + 1] in ltr) "$s+" else s
+        ssRes += if (s in ltrL && ss[i + 1] in ltrR) "$s+" else s
     }
     println(ssRes)
-    return parse(ssRes)
+    return parse(ssRes, Node("", "", "", null, null, null, "")).toString()
 }
 
-fun parse(s: String):String {
-    if (s.length == 1) return "Normal(\\'$s\\')"
+fun parse(s: String, parent: Node):Node {
+//    if (s.length == 1) return "Normal(\\'$s\\')"
+    if (s.length == 1) return Node("", "", "", parent , null, null, "Normal(\\'$s\\')")
     val ltr = listOf('a', 'b', '.', 'N')
     val map = mapOf('*' to 1, '+' to 2, '|' to 3)
     var ind = 0
+    var operNum = 0
     var w = 0
     var brk = 0
     for ((i, c) in s.toCharArray().iterator().withIndex()) {
@@ -30,6 +33,7 @@ fun parse(s: String):String {
         }
         if (brk != 0) continue
         if (c in ltr) continue
+        operNum++
         if (w <= map[c] ?: error("No such operation")) {
             w = map[c] ?: error("No such operation")
             ind = i
@@ -41,9 +45,12 @@ fun parse(s: String):String {
     val oper = s[ind]
     val left = s.substring(0, ind)
     val right = s.substring(ind + 1, s.length)
+    //===================
     println("oper: $oper, left: $left, right: $right")
     parse(left)
     parse(right)
     return ""
 }
+
+class Node(oper: String, leftT: String, rightT: String, parent: Node?, left: Node?, right: Node?, result:String)
 
