@@ -14,7 +14,7 @@ fun parseRegexp(s: String):String {
 }
 
 fun parse(s: String):String {
-    if (s.length == 1) return "Normal(\\'$s\\')"
+    if (s.length == 1) return "Normal('$s')"
     val ltr = listOf('a', 'b', '.', 'N')
     val map = mapOf('*' to 1, '+' to 2, '|' to 3)
     var ind = 0
@@ -32,7 +32,7 @@ fun parse(s: String):String {
         }
         if (brk != 0) continue
         if (c in ltr) continue
-        operNum++
+//        operNum++
         if (w <= map[c] ?: error("No such operation")) {
             w = map[c] ?: error("No such operation")
             ind = i
@@ -44,9 +44,17 @@ fun parse(s: String):String {
     val oper = s[ind]
     val left = s.substring(0, ind)
     val right = s.substring(ind + 1, s.length)
+//    if (operNum == 1) {
+
+//    }
+    when {
+        oper == '*' -> return "ZeroOrNull( ${parse(left)} )"
+        oper == '|' -> return "Or (${parse(left)}, ${parse(right)})"
+        else -> return "Str([${parse(left)}, ${parse(right)}])"
+    }
     //===================
-    println("oper: $oper, left: $left, right: $right")
-    parse(left)
-    parse(right)
-    return ""
+//    println("oper: $oper, left: $left, right: $right")
+//    parse(left)
+//    parse(right)
+//    return ""
 }
