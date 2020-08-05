@@ -1,34 +1,52 @@
 package org.pva.KotlinCodewars.kyu3
 
-import java.util.*
-
 
 fun parseRegexp(s: String):String {
-    val q = Stack<Char>()
-    val w = Stack<Char>()
+    var ss = s.replace(Regex("\\*"), "*N")
     val ltr = listOf('a', 'b', '.')
-    val sgn = listOf('|', '*', '(', ')')
-
-    for (c in s.toCharArray()) {
-        if (c in ltr) q.push(c) else w.push(c)
+    var ssRes = ""
+    for ((i, s) in ss.toCharArray().iterator().withIndex()) {
+        if (s in ltr && ss[i + 1] in ltr) {
+            ssRes += "$s+"
+        } else {
+            ssRes += s
+        }
     }
-    println(q)
-    println(w)
-//    parseStacks(q, w)
-    //------
-//    if (s.length == 1) return "Normal(\'$s\')"
-//    if (!s.contains(Regex("\\.|\\*|\\|"))) {
-//        var ins = s.replace(Regex("\\(|\\)"), "")
-//        ins = ins.toCharArray().map { "Normal(\'$it\')" }.joinToString(", ")
-//        return "Str ([$ins])"
-//    }
-    return parseStacks(q, w)
+    println(ssRes)
+    return parse(ssRes)
 }
 
-fun parseStacks(q: Stack<Char>, w: Stack<Char>):String {
-    if (w.pop() == '*') {
-        return "ZeroOrMore (${parseStacks(q, w)})"
+fun parse(s: String):String {
+    val ltr = listOf('a', 'b', '.')
+    val map = mapOf('*' to 3, '+' to 2, '|' to 1)
+    var ind = 0
+    var w = 0
+    var brk = 0
+    for ((i, c) in s.toCharArray().iterator().withIndex()) {
+        if (c == '(') {
+            brk++
+            continue
+        }
+        if (c == ')') {
+            brk--
+            continue
+        }
+        if (brk != 0) continue
+        if (c in ltr) continue
+        if (w <= map[c] ?: error("No such operation")) {
+            w = map[c] ?: error("No such operation")
+            ind = i
+        }
     }
+    if (ind == 0) {
+        return parse(s.substring(1, s.length - 1))
+    }
+    val oper = s[ind]
+    val left = s.substring(0, ind)
+    val right = s.substring(ind + 1, s.length)
+    println("oper: $oper, left: $left, right: $right")
+    parse(left)
+    parse(right)
     return ""
 }
 
