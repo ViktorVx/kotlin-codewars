@@ -2,11 +2,16 @@ package org.pva.KotlinCodewars.kyu3
 
 
 fun parseRegexp(s: String):String {
+    println(s)
     var ss = s.replace(Regex("\\*"), "*N")
     val ltrL = listOf('a', 'b', '.')
     val ltrR = listOf('a', 'b', '.', '(')
     var ssRes = ""
     for ((i, s) in ss.toCharArray().iterator().withIndex()) {
+        if (i == ss.length - 1) {
+            ssRes += s
+            break
+        }
         ssRes += if (s in ltrL && ss[i + 1] in ltrR) "$s+" else s
     }
     println(ssRes)
@@ -46,6 +51,6 @@ fun parse(s: String):String {
     when {
         oper == '*' -> return "ZeroOrNull( ${parse(left)} )"
         oper == '|' -> return "Or (${parse(left)}, ${parse(right)})"
-        else -> return "Str([${parse(left)}, ${parse(right)}])"
+        else -> return "Str ([${parse(left)}, ${parse(right)}])"
     }
 }
