@@ -13,5 +13,6 @@ internal class Kyu3 {
         assertEquals("ZeroOrMore (Str ([Normal ('a'), Normal ('b')]))", parseRegexp("(ab)*"))
         assertEquals("ZeroOrMore (Or (Normal ('a'), Normal ('b')))", parseRegexp("(a|b)*"))
         assertEquals("Or (Str ([Normal ('a'), ZeroOrMore (Any())]), Str ([Normal ('b'), Normal ('b')]))", parseRegexp("(a.*)|(bb)"))
+//        assertEquals("Or (Str ([Normal ('a'), ZeroOrMore (Any())]), Str ([Normal ('b'), Normal ('b')]))", parseRegexp("ab|a"))
     }
 }
