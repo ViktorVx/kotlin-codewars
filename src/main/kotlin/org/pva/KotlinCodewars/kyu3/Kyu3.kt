@@ -8,13 +8,8 @@ fun parseRegexp(s: String):String {
     val ltrR = listOf('a', 'b', '.', '(')
     var ssRes = ""
     for ((i, s) in ss.toCharArray().iterator().withIndex()) {
-        if (i == ss.length - 1) {
-            ssRes += s
-            break
-        }
-        ssRes += if (s in ltrL && ss[i + 1] in ltrR) "$s+" else s
+        ssRes += if (i == ss.length - 1) s else if (s in ltrL && ss[i + 1] in ltrR) "$s+" else s
     }
-    println(ssRes)
     return parse(ssRes)
 }
 
@@ -26,6 +21,7 @@ fun parse(s: String):String {
     var w = 0
     var brk = 0
     for ((i, c) in s.toCharArray().iterator().withIndex()) {
+        if (c in ltr) continue
         if (c == '(') {
             brk++
             continue
@@ -35,22 +31,19 @@ fun parse(s: String):String {
             continue
         }
         if (brk != 0) continue
-        if (c in ltr) continue
         if (w <= map[c] ?: error("No such operation")) {
             w = map[c] ?: error("No such operation")
             ind = i
         }
     }
-    if (ind == 0) {
-        return parse(s.substring(1, s.length - 1))
-    }
+    if (ind == 0) return parse(s.substring(1, s.length - 1))
+
     val oper = s[ind]
     val left = s.substring(0, ind)
     val right = s.substring(ind + 1, s.length)
-
-    when {
-        oper == '*' -> return "ZeroOrMore (${parse(left)})"
-        oper == '|' -> return "Or (${parse(left)}, ${parse(right)})"
-        else -> return "Str ([${parse(left)}, ${parse(right)}])"
+    return when (oper) {
+        '*' -> "ZeroOrMore (${parse(left)})"
+        '|' -> "Or (${parse(left)}, ${parse(right)})"
+        else -> "Str ([${parse(left)}, ${parse(right)}])"
     }
 }
