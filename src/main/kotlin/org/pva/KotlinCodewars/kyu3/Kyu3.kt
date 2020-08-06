@@ -19,7 +19,7 @@ fun parseRegexp(s: String):String {
 }
 
 fun parse(s: String):String {
-    if (s.length == 1) return if (s == ".") "Any()" else "Normal('$s')"
+    if (s.length == 1) return if (s == ".") "Any()" else "Normal ('$s')"
     val ltr = listOf('a', 'b', '.', 'N')
     val map = mapOf('*' to 1, '+' to 2, '|' to 3)
     var ind = 0
@@ -49,7 +49,7 @@ fun parse(s: String):String {
     val right = s.substring(ind + 1, s.length)
 
     when {
-        oper == '*' -> return "ZeroOrNull( ${parse(left)} )"
+        oper == '*' -> return "ZeroOrMore (${parse(left)})"
         oper == '|' -> return "Or (${parse(left)}, ${parse(right)})"
         else -> return "Str ([${parse(left)}, ${parse(right)}])"
     }
