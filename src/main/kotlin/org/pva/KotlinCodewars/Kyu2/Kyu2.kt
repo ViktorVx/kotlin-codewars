@@ -1,4 +1,4 @@
-package org.pva.KotlinCodewars.kyu3
+package org.pva.KotlinCodewars.Kyu2
 
 
 fun parseRegexp(s: String):String {

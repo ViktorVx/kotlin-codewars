@@ -2,8 +2,9 @@ package org.pva.KotlinCodewars.kyu3
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.pva.KotlinCodewars.Kyu2.parseRegexp
 
-internal class Kyu3 {
+internal class Kyu2 {
 
     @Test
     fun testing() {
