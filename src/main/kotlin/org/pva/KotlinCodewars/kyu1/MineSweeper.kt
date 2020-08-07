@@ -18,17 +18,18 @@ class MineSweeper(val board: String, val nMines: Int) {
 
     fun solve(): String {
         val vfArr = vfStrToArr(vfStr)
+        println(vfArrToStr(vfArr))
         return ""
     }
 
-    fun vfStrToArr(str:String): ArrayList<CharArray> {
+    private fun vfStrToArr(str:String): ArrayList<CharArray> {
         return str.lines()
                 .map { it.replace(Regex("\\s"), "").toCharArray() }
                 .toCollection(arrayListOf())
     }
 
-    fun vfArrToStr(arr: Array<CharArray>): String {
-        return ""
+    private fun vfArrToStr(arr: ArrayList<CharArray>): String {
+        return arr.joinToString("\n") { it.joinToString(" ") }
     }
 
     fun printVfArr(arr: Array<CharArray>) {
