@@ -17,15 +17,22 @@ class MineSweeper(val board: String, val nMines: Int) {
     val nMns = 6
 
     fun solve(): String {
+        val vfArr = vfStrToArr(vfStr)
         return ""
     }
 
-    fun vfStrToArr(str:String):Array<CharArray> {
-        return emptyArray()
+    fun vfStrToArr(str:String): ArrayList<CharArray> {
+        return str.lines()
+                .map { it.replace(Regex("\\s"), "").toCharArray() }
+                .toCollection(arrayListOf())
     }
 
     fun vfArrToStr(arr: Array<CharArray>): String {
         return ""
+    }
+
+    fun printVfArr(arr: Array<CharArray>) {
+
     }
 
 }
