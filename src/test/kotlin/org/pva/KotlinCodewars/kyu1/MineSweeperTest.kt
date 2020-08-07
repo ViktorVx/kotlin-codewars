@@ -161,10 +161,11 @@ class MineSweeperTest {
 
     @Test
     fun sampleTests() {
-        for (count in 0..5) {
+        MineSweeper("", 3).solve()
+//        for (count in 0..5) {
 //            Game.newGame(DATA[count][1])
 //            Game.read(DATA[count][2])
 //            makeAssertionAndDisplay(DATA[count][0], DATA[count][3], MineSweeper(DATA[count][2], Game.minesN).solve())
-        }
+//        }
     }
 }
