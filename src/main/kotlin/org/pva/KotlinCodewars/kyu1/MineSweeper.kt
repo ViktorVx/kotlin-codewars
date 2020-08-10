@@ -18,7 +18,7 @@ class MineSweeper(val board: String, val nMines: Int) {
 
     fun solve(): String {
         val vfArr = vfStrToArr(vfStr)
-        println(vfArrToStr(vfArr))
+        printVfArr(vfArr)
         return ""
     }
 
@@ -32,8 +32,9 @@ class MineSweeper(val board: String, val nMines: Int) {
         return arr.joinToString("\n") { it.joinToString(" ") }
     }
 
-    fun printVfArr(arr: Array<CharArray>) {
-
+    fun printVfArr(arr: ArrayList<CharArray>) {
+        println(vfArrToStr(arr))
+        println("*".repeat(arr[0].size * 2 - 1))
     }
 
 }
