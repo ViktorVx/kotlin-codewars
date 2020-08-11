@@ -15,6 +15,7 @@ class MineSweeper(val board: String, val nMines: Int) {
                   |? ? ? ? ? ?
                   |0 0 0 ? ? ?""".trimMargin()
     val nMns = 6
+    var findedMines = 0
 
     fun solve(): String {
         var vfArr = vfStrToArr(vfStr)
@@ -45,6 +46,7 @@ class MineSweeper(val board: String, val nMines: Int) {
     private fun analyse(arr: ArrayList<CharArray>): Step? {
         for ((indX, x) in arr.iterator().withIndex()) {
             loop@ for ((indY, y) in arr[indX].iterator().withIndex()) {
+                if (findedMines == nMns) return chooseAnyEmpty(indX, indY, arr, Flag.EMPTY)
                 when(y) {
                     '?', 'x' -> continue@loop
                     else -> {
@@ -60,8 +62,8 @@ class MineSweeper(val board: String, val nMines: Int) {
                         if (indY != 0) countSurrounding(arr[indX][indY - 1], map)
 
                         if (map.get("unknown") == 0) continue@loop
-                        if (cellValue == map.get("mines")) return chooseAnyEmpty(indX, indY, arr)
-
+                        if (cellValue == map.get("mines")) return chooseAnyEmpty(indX, indY, arr, Flag.EMPTY)
+                        if (map.get("unknown") == cellValue - map.get("mines")!!) return chooseAnyEmpty(indX, indY, arr, Flag.MINE)
                     }
                 }
             }
@@ -69,15 +71,15 @@ class MineSweeper(val board: String, val nMines: Int) {
         return null
     }
 
-    private fun chooseAnyEmpty(indX: Int, indY: Int, arr: ArrayList<CharArray>): Step? {
-        if (indX != 0 && indY != 0 && arr[indX - 1][indY - 1] == '?') return Step(indX - 1, indY - 1, Flag.EMPTY)
-        if (indX != 0 && arr[indX - 1][indY] == '?') return Step(indX - 1, indY, Flag.EMPTY)
-        if (indX != 0 && indY != arr[0].size - 1 && arr[indX - 1][indY + 1] == '?') return Step(indX - 1, indY + 1, Flag.EMPTY)
-        if (indY != arr[0].size - 1 && arr[indX][indY + 1] == '?') return Step(indX, indY + 1, Flag.EMPTY)
-        if (indX != arr.size - 1 && indY != arr[0].size - 1 && arr[indX + 1][indY + 1] == '?') return Step(indX + 1, indY + 1, Flag.EMPTY)
-        if (indX != arr.size - 1 && arr[indX + 1][indY] == '?') return Step(indX + 1, indY, Flag.EMPTY)
-        if (indX != arr.size - 1 && indY != 0 && arr[indX + 1][indY - 1] == '?') return Step(indX + 1, indY - 1, Flag.EMPTY)
-        if (indY != 0 && arr[indX][indY - 1] == '?') return Step(indX, indY - 1, Flag.EMPTY)
+    private fun chooseAnyEmpty(indX: Int, indY: Int, arr: ArrayList<CharArray>, flag: Flag): Step? {
+        if (indX != 0 && indY != 0 && arr[indX - 1][indY - 1] == '?') return Step(indX - 1, indY - 1, flag)
+        if (indX != 0 && arr[indX - 1][indY] == '?') return Step(indX - 1, indY, flag)
+        if (indX != 0 && indY != arr[0].size - 1 && arr[indX - 1][indY + 1] == '?') return Step(indX - 1, indY + 1, flag)
+        if (indY != arr[0].size - 1 && arr[indX][indY + 1] == '?') return Step(indX, indY + 1, flag)
+        if (indX != arr.size - 1 && indY != arr[0].size - 1 && arr[indX + 1][indY + 1] == '?') return Step(indX + 1, indY + 1, flag)
+        if (indX != arr.size - 1 && arr[indX + 1][indY] == '?') return Step(indX + 1, indY, flag)
+        if (indX != arr.size - 1 && indY != 0 && arr[indX + 1][indY - 1] == '?') return Step(indX + 1, indY - 1, flag)
+        if (indY != 0 && arr[indX][indY - 1] == '?') return Step(indX, indY - 1, flag)
         return null
     }
 
@@ -91,6 +93,10 @@ class MineSweeper(val board: String, val nMines: Int) {
     private fun makeStep(step: Step, visible: ArrayList<CharArray>, real: ArrayList<CharArray>) {
         when(step.flag) {
             Flag.EMPTY -> if (real[step.x][step.y] != 'x') visible[step.x][step.y] = real[step.x][step.y] else throw WrongStepException()
+            Flag.MINE -> if (real[step.x][step.y] == 'x') {
+                visible[step.x][step.y] = real[step.x][step.y]
+                findedMines++
+            } else throw WrongStepException()
         }
     }
 
