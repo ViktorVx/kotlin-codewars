@@ -3,11 +3,11 @@ package org.pva.KotlinCodewars.kyu1
 class MineSweeper(val board: String, val nMines: Int) {
 
     val rfStr = """1 x 1 1 x 1
-                      |2 2 2 1 2 2
-                      |2 x 2 0 1 x
-                      |2 x 2 1 2 2
-                      |1 1 1 1 x 1
-                      |0 0 0 1 1 1""".trimMargin()
+                  |2 2 2 1 2 2
+                  |2 x 2 0 1 x
+                  |2 x 2 1 2 2
+                  |1 1 1 1 x 1
+                  |0 0 0 1 1 1""".trimMargin()
     var vfStr = """? ? ? ? ? ?
                   |? ? ? ? ? ?
                   |? ? ? 0 ? ?
