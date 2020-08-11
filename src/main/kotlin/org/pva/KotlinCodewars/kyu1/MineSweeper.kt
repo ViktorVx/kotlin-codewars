@@ -46,24 +46,46 @@ class MineSweeper(val board: String, val nMines: Int) {
         for ((indX, x) in arr.iterator().withIndex()) {
             loop@ for ((indY, y) in arr[indX].iterator().withIndex()) {
                 when(y) {
-                    '?' -> continue@loop
-                    '0' -> {
-                        if (indX != 0 && indY != 0 && arr[indX - 1][indY - 1] == '?') return Step(indX - 1, indY - 1, Flag.EMPTY)
-                        if (indX != 0 && arr[indX - 1][indY] == '?') return Step(indX - 1, indY, Flag.EMPTY)
-                        if (indX != 0 && indY != arr[0].size - 1 && arr[indX - 1][indY + 1] == '?') return Step(indX - 1, indY + 1, Flag.EMPTY)
-                        if (indY != arr[0].size - 1 && arr[indX][indY + 1] == '?') return Step(indX, indY + 1, Flag.EMPTY)
-                        if (indX != arr.size - 1 && indY != arr[0].size - 1 && arr[indX + 1][indY + 1] == '?') return Step(indX + 1, indY + 1, Flag.EMPTY)
-                        if (indX != arr.size - 1 && arr[indX + 1][indY] == '?') return Step(indX + 1, indY, Flag.EMPTY)
-                        if (indX != arr.size - 1 && indY != 0 && arr[indX + 1][indY - 1] == '?') return Step(indX + 1, indY - 1, Flag.EMPTY)
-                        if (indY != 0 && arr[indX][indY - 1] == '?') return Step(indX, indY - 1, Flag.EMPTY)
-                    }
+                    '?', 'x' -> continue@loop
                     else -> {
-                        continue@loop
+                        val cellValue = Character.getNumericValue(y)
+                        var map = mutableMapOf("unknown" to 0, "mines" to 0)
+                        if (indX != 0 && indY != 0) countSurrounding(arr[indX - 1][indY - 1], map)
+                        if (indX != 0) countSurrounding(arr[indX - 1][indY], map)
+                        if (indX != 0 && indY != arr[0].size - 1) countSurrounding(arr[indX - 1][indY + 1], map)
+                        if (indY != arr[0].size - 1) countSurrounding(arr[indX][indY + 1], map)
+                        if (indX != arr.size - 1 && indY != arr[0].size - 1) countSurrounding(arr[indX + 1][indY + 1], map)
+                        if (indX != arr.size - 1) countSurrounding(arr[indX + 1][indY], map)
+                        if (indX != arr.size - 1 && indY != 0) countSurrounding(arr[indX + 1][indY - 1], map)
+                        if (indY != 0) countSurrounding(arr[indX][indY - 1], map)
+
+                        if (map.get("unknown") == 0) continue@loop
+                        if (cellValue == map.get("mines")) return chooseAnyEmpty(indX, indY, arr)
+
                     }
                 }
             }
         }
         return null
+    }
+
+    private fun chooseAnyEmpty(indX: Int, indY: Int, arr: ArrayList<CharArray>): Step? {
+        if (indX != 0 && indY != 0 && arr[indX - 1][indY - 1] == '?') return Step(indX - 1, indY - 1, Flag.EMPTY)
+        if (indX != 0 && arr[indX - 1][indY] == '?') return Step(indX - 1, indY, Flag.EMPTY)
+        if (indX != 0 && indY != arr[0].size - 1 && arr[indX - 1][indY + 1] == '?') return Step(indX - 1, indY + 1, Flag.EMPTY)
+        if (indY != arr[0].size - 1 && arr[indX][indY + 1] == '?') return Step(indX, indY + 1, Flag.EMPTY)
+        if (indX != arr.size - 1 && indY != arr[0].size - 1 && arr[indX + 1][indY + 1] == '?') return Step(indX + 1, indY + 1, Flag.EMPTY)
+        if (indX != arr.size - 1 && arr[indX + 1][indY] == '?') return Step(indX + 1, indY, Flag.EMPTY)
+        if (indX != arr.size - 1 && indY != 0 && arr[indX + 1][indY - 1] == '?') return Step(indX + 1, indY - 1, Flag.EMPTY)
+        if (indY != 0 && arr[indX][indY - 1] == '?') return Step(indX, indY - 1, Flag.EMPTY)
+        return null
+    }
+
+    private fun countSurrounding(arrVal:Char, map:MutableMap<String, Int>) {
+        when (arrVal) {
+            '?' -> map.get("unknown")?.let { map.put("unknown", it +1) }
+            'x' -> map.get("mines")?.let { map.put("mines", it + 1) }
+        }
     }
 
     private fun makeStep(step: Step, visible: ArrayList<CharArray>, real: ArrayList<CharArray>) {
