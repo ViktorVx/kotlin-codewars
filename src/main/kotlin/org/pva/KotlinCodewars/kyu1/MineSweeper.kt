@@ -36,6 +36,9 @@ class MineSweeper(val board: String, val nMines: Int) {
     //todo Реализовать матрицу вероятностей, проставляем мину на клетку с самой большой вероятностью.
     // Если все вероятности равны, то определить мины не можем
 
+    //todo Останавливать простейший алгоритм и запускать алгоритм с вероятностями, если
+    // видимое поле не изменилось или не был создан в течение прохода очередной Step
+
     private fun vfStrToArr(str:String): ArrayList<CharArray> {
         return str.lines()
                 .map { it.replace(Regex("\\s"), "").toCharArray() }
