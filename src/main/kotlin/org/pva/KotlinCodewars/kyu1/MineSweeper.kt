@@ -1,5 +1,7 @@
 package org.pva.KotlinCodewars.kyu1
 
+import kotlin.Array as Array1
+
 class MineSweeper(val board: String, val nMines: Int) {
 
     val rfStr = """1 x 1 1 x 1
@@ -20,24 +22,27 @@ class MineSweeper(val board: String, val nMines: Int) {
     fun solve(): String {
         var vfArr = vfStrToArr(vfStr)
         val rfArr = vfStrToArr(rfStr)
+        var probArr = Array1(vfArr.size) { IntArray(vfArr[0].size) }
         printVfArr(vfArr)
-        //******************
-        for (c in 1..vfArr.size * vfArr[0].size) {
-            var step = analyse(vfArr)
-            if (step != null) {
-                makeStep(step, vfArr, rfArr)
-            }
+        //****************** Simple algorithm ******************
+        while (true) {
+            val step = simpleAlgorithm(vfArr)
+            if (step == null) break
+            makeStep(step, vfArr, rfArr)
             printVfArr(vfArr)
         }
-        //******************
+        //****************** Probability algorithm ******************
+        if (!checkClearField(vfArr)) {
+            probabilityAlgorithm(vfArr, probArr)
+        }
         return ""
     }
 
     //todo Реализовать матрицу вероятностей, проставляем мину на клетку с самой большой вероятностью.
     // Если все вероятности равны, то определить мины не можем
 
-    //todo Останавливать простейший алгоритм и запускать алгоритм с вероятностями, если
-    // видимое поле не изменилось или не был создан в течение прохода очередной Step
+    //todo после алгоритма вероятности сохранять состояние и пробовать простовлять мину
+    // на клетку с большей вероятностью
 
     private fun vfStrToArr(str:String): ArrayList<CharArray> {
         return str.lines()
@@ -49,7 +54,7 @@ class MineSweeper(val board: String, val nMines: Int) {
         return arr.joinToString("\n") { it.joinToString(" ") }
     }
 
-    private fun analyse(arr: ArrayList<CharArray>): Step? {
+    private fun simpleAlgorithm(arr: ArrayList<CharArray>): Step? {
         for ((indX, x) in arr.iterator().withIndex()) {
             loop@ for ((indY, y) in arr[indX].iterator().withIndex()) {
                 if (findedMines == nMns) return chooseAnyEmpty(indX, indY, arr, Flag.EMPTY)
@@ -89,11 +94,40 @@ class MineSweeper(val board: String, val nMines: Int) {
         return null
     }
 
-    private fun countSurrounding(arrVal:Char, map:MutableMap<String, Int>) {
-        when (arrVal) {
-            '?' -> map.get("unknown")?.let { map.put("unknown", it +1) }
-            'x' -> map.get("mines")?.let { map.put("mines", it + 1) }
+    private fun probabilityAlgorithm(arr: ArrayList<CharArray>, probArr: kotlin.Array<IntArray>): Step? {
+        for ((indX, x) in arr.iterator().withIndex()) {
+            loop@ for ((indY, y) in arr[indX].iterator().withIndex()) {
+                if (findedMines == nMns) return chooseAnyEmpty(indX, indY, arr, Flag.EMPTY)
+                when(y) {
+                    '?', 'x' -> continue@loop
+                    else -> {
+                        val cellValue = Character.getNumericValue(y)
+                        var map = mutableMapOf("unknown" to 0, "mines" to 0)
+                        if (indX != 0 && indY != 0) countSurrounding(arr[indX - 1][indY - 1], map)
+                        if (indX != 0) countSurrounding(arr[indX - 1][indY], map)
+                        if (indX != 0 && indY != arr[0].size - 1) countSurrounding(arr[indX - 1][indY + 1], map)
+                        if (indY != arr[0].size - 1) countSurrounding(arr[indX][indY + 1], map)
+                        if (indX != arr.size - 1 && indY != arr[0].size - 1) countSurrounding(arr[indX + 1][indY + 1], map)
+                        if (indX != arr.size - 1) countSurrounding(arr[indX + 1][indY], map)
+                        if (indX != arr.size - 1 && indY != 0) countSurrounding(arr[indX + 1][indY - 1], map)
+                        if (indY != 0) countSurrounding(arr[indX][indY - 1], map)
+
+                        if (map.get("unknown") == 0) continue@loop
+                        val probability = 100 / map.get("unknown")!! * (cellValue - map.get("mines")!!)
+
+                        if (indX != 0 && indY != 0 && arr[indX - 1][indY - 1] == '?') probArr[indX - 1][indY - 1]+=probability
+                        if (indX != 0 && arr[indX - 1][indY] == '?') probArr[indX - 1][indY]+=probability
+                        if (indX != 0 && indY != arr[0].size - 1 && arr[indX - 1][indY + 1] == '?') probArr[indX - 1][indY + 1]+=probability
+                        if (indY != arr[0].size - 1 && arr[indX][indY + 1] == '?') probArr[indX][indY + 1]+=probability
+                        if (indX != arr.size - 1 && indY != arr[0].size - 1 && arr[indX + 1][indY + 1] == '?') probArr[indX + 1][indY + 1]+=probability
+                        if (indX != arr.size - 1 && arr[indX + 1][indY] == '?') probArr[indX + 1][indY]+=probability
+                        if (indX != arr.size - 1 && indY != 0 && arr[indX + 1][indY - 1] == '?') probArr[indX + 1][indY - 1]+=probability
+                        if (indY != 0 && arr[indX][indY - 1] == '?') probArr[indX][indY - 1]+=probability
+                    }
+                }
+            }
         }
+        return null
     }
 
     private fun makeStep(step: Step, visible: ArrayList<CharArray>, real: ArrayList<CharArray>) {
@@ -104,6 +138,22 @@ class MineSweeper(val board: String, val nMines: Int) {
                 findedMines++
             } else throw WrongStepException()
         }
+    }
+
+    private fun countSurrounding(arrVal:Char, map:MutableMap<String, Int>) {
+        when (arrVal) {
+            '?' -> map.get("unknown")?.let { map.put("unknown", it +1) }
+            'x' -> map.get("mines")?.let { map.put("mines", it + 1) }
+        }
+    }
+
+    private fun checkClearField(visible: ArrayList<CharArray>): Boolean {
+        for ((indX, x) in visible.iterator().withIndex()) {
+            for ((indY, y) in visible[indX].iterator().withIndex()) {
+                if (y == '?') return false
+            }
+        }
+        return true
     }
 
     private fun printVfArr(arr: ArrayList<CharArray>) {
