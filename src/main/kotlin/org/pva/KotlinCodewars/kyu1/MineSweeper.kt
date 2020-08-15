@@ -26,23 +26,56 @@ class MineSweeper(val board: String, val nMines: Int) {
         printVfArr(vfArr)
         //****************** Simple algorithm ******************
         while (true) {
-            val step = simpleAlgorithm(vfArr)
-            if (step == null) break
-            makeStep(step, vfArr, rfArr)
+            var step = simpleAlgorithm(vfArr)
+            if (step == null) {
+                //****************** Probability algorithm ******************
+                if (checkClearField(vfArr)) break
+
+                probabilityAlgorithm(vfArr, probArr)
+                step = analyseProbArray(probArr)
+                if (step == null) {
+                    completeFieldWithUnknown(vfArr)
+                    break
+                }
+                makeStep(step, vfArr, rfArr)
+            } else {
+                makeStep(step, vfArr, rfArr)
+            }
             printVfArr(vfArr)
         }
-        //****************** Probability algorithm ******************
-        if (!checkClearField(vfArr)) {
-            probabilityAlgorithm(vfArr, probArr)
+        if (vfArrToStr(vfArr) == vfArrToStr(rfArr)) {
+            println("SUCCESS")
         }
         return ""
     }
 
-    //todo Реализовать матрицу вероятностей, проставляем мину на клетку с самой большой вероятностью.
-    // Если все вероятности равны, то определить мины не можем
+    private fun analyseProbArray(probArr: kotlin.Array<IntArray>): Step? {
+        var maxVal = 0
+        var maxX = 0
+        var maxY = 0
+        var average = 0
+        var allHaveSameProbability = true
+        for ((indX, x) in probArr.iterator().withIndex()) {
+            for ((indY, y) in probArr[indX].iterator().withIndex()) {
+                if (y == 0) continue
 
-    //todo после алгоритма вероятности сохранять состояние и пробовать простовлять мину
-    // на клетку с большей вероятностью
+                if (average == 0) average = y
+                if (average != y) allHaveSameProbability = false
+
+                if (maxVal < y) {
+                    maxVal = y
+                    maxX = indX
+                    maxY = indY
+                }
+            }
+        }
+        return if (allHaveSameProbability) null else Step(maxX, maxY, Flag.MINE)
+
+    }
+
+    private fun completeFieldWithUnknown(arr: ArrayList<CharArray>) {
+        // do nothing
+    }
 
     private fun vfStrToArr(str:String): ArrayList<CharArray> {
         return str.lines()
@@ -166,6 +199,6 @@ class MineSweeper(val board: String, val nMines: Int) {
     class WrongStepException: Exception()
     
     enum class Flag {
-        EMPTY, MINE, QUESTION
+        EMPTY, MINE
     }
 }
