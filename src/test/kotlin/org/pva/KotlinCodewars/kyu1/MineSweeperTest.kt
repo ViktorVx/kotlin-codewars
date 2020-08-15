@@ -1,6 +1,6 @@
 package org.pva.KotlinCodewars.kyu1
 
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 class MineSweeperTest {
@@ -155,17 +155,16 @@ class MineSweeperTest {
                 |But was:
                 |$actual""".trimMargin())
         }
-        assertEquals(message, expected, actual)
+        assertEquals(expected, actual, message)
     }
 
 
     @Test
     fun sampleTests() {
-        MineSweeper("", 3).solve()
-//        for (count in 0..5) {
-//            Game.newGame(DATA[count][1])
-//            Game.read(DATA[count][2])
-//            makeAssertionAndDisplay(DATA[count][0], DATA[count][3], MineSweeper(DATA[count][2], Game.minesN).solve())
-//        }
+        for (count in 0..5) {
+            Game.newGame(DATA[count][1])
+            Game.read(DATA[count][2])
+            makeAssertionAndDisplay(DATA[count][0], DATA[count][3], MineSweeper(DATA[count][2], Game.minesN).solve())
+        }
     }
 }

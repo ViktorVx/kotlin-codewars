@@ -1,6 +1,6 @@
 package org.pva.KotlinCodewars.kyu1
 
-import kotlin.Array as Array1
+import kotlin.Array as Array
 
 class MineSweeper(val board: String, val nMines: Int) {
 
@@ -14,8 +14,8 @@ class MineSweeper(val board: String, val nMines: Int) {
     var findedMines = 0
 
     fun solve(): String {
-        var vfArr = vfStrToArr(vfStr)
-        var probArr = Array1(vfArr.size) { IntArray(vfArr[0].size) }
+        val vfArr = vfStrToArr(vfStr)
+        val probArr = Array(vfArr.size) { IntArray(vfArr[0].size) }
         printVfArr(vfArr)
         //****************** Simple algorithm ******************
         while (true) {
@@ -26,17 +26,15 @@ class MineSweeper(val board: String, val nMines: Int) {
 
                 probabilityAlgorithm(vfArr, probArr)
                 step = analyseProbArray(probArr)
-                if (step == null) {
-                    completeFieldWithUnknown(vfArr)
-                    break
-                }
+                if (step == null) break
+
                 makeStep(step, vfArr)
             } else {
                 makeStep(step, vfArr)
             }
             printVfArr(vfArr)
         }
-        return ""
+        return vfArrToStr(vfArr)
     }
 
     private fun analyseProbArray(probArr: kotlin.Array<IntArray>): Step? {
@@ -74,7 +72,7 @@ class MineSweeper(val board: String, val nMines: Int) {
     }
 
     private fun simpleAlgorithm(arr: ArrayList<CharArray>): Step? {
-        for ((indX, x) in arr.iterator().withIndex()) {
+        for ((indX, _) in arr.iterator().withIndex()) {
             loop@ for ((indY, y) in arr[indX].iterator().withIndex()) {
                 if (findedMines == nMns) return chooseAnyEmpty(indX, indY, arr, Flag.EMPTY)
                 when(y) {
@@ -114,7 +112,7 @@ class MineSweeper(val board: String, val nMines: Int) {
     }
 
     private fun probabilityAlgorithm(arr: ArrayList<CharArray>, probArr: kotlin.Array<IntArray>): Step? {
-        for ((indX, x) in arr.iterator().withIndex()) {
+        for ((indX, _) in arr.iterator().withIndex()) {
             loop@ for ((indY, y) in arr[indX].iterator().withIndex()) {
                 if (findedMines == nMns) return chooseAnyEmpty(indX, indY, arr, Flag.EMPTY)
                 when(y) {
