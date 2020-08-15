@@ -4,12 +4,6 @@ import kotlin.Array as Array1
 
 class MineSweeper(val board: String, val nMines: Int) {
 
-    val rfStr = """1 x 1 1 x 1
-                  |2 2 2 1 2 2
-                  |2 x 2 0 1 x
-                  |2 x 2 1 2 2
-                  |1 1 1 1 x 1
-                  |0 0 0 1 1 1""".trimMargin()
     var vfStr = """? ? ? ? ? ?
                   |? ? ? ? ? ?
                   |? ? ? 0 ? ?
@@ -21,7 +15,6 @@ class MineSweeper(val board: String, val nMines: Int) {
 
     fun solve(): String {
         var vfArr = vfStrToArr(vfStr)
-        val rfArr = vfStrToArr(rfStr)
         var probArr = Array1(vfArr.size) { IntArray(vfArr[0].size) }
         printVfArr(vfArr)
         //****************** Simple algorithm ******************
@@ -37,14 +30,11 @@ class MineSweeper(val board: String, val nMines: Int) {
                     completeFieldWithUnknown(vfArr)
                     break
                 }
-                makeStep(step, vfArr, rfArr)
+                makeStep(step, vfArr)
             } else {
-                makeStep(step, vfArr, rfArr)
+                makeStep(step, vfArr)
             }
             printVfArr(vfArr)
-        }
-        if (vfArrToStr(vfArr) == vfArrToStr(rfArr)) {
-            println("SUCCESS")
         }
         return ""
     }
@@ -71,10 +61,6 @@ class MineSweeper(val board: String, val nMines: Int) {
         }
         return if (allHaveSameProbability) null else Step(maxX, maxY, Flag.MINE)
 
-    }
-
-    private fun completeFieldWithUnknown(arr: ArrayList<CharArray>) {
-        // do nothing
     }
 
     private fun vfStrToArr(str:String): ArrayList<CharArray> {
@@ -163,13 +149,13 @@ class MineSweeper(val board: String, val nMines: Int) {
         return null
     }
 
-    private fun makeStep(step: Step, visible: ArrayList<CharArray>, real: ArrayList<CharArray>) {
+    private fun makeStep(step: Step, visible: ArrayList<CharArray>) {
         when(step.flag) {
-            Flag.EMPTY -> if (real[step.x][step.y] != 'x') visible[step.x][step.y] = real[step.x][step.y] else throw WrongStepException()
-            Flag.MINE -> if (real[step.x][step.y] == 'x') {
-                visible[step.x][step.y] = real[step.x][step.y]
+            Flag.EMPTY -> visible[step.x][step.y] = "${Game.open(step.x, step.y)}".toCharArray()[0]
+            Flag.MINE -> {
+                visible[step.x][step.y] = 'x'
                 findedMines++
-            } else throw WrongStepException()
+            }
         }
     }
 
@@ -196,8 +182,6 @@ class MineSweeper(val board: String, val nMines: Int) {
 
     class Step(val x: Int, val y:Int, val flag:Flag)
 
-    class WrongStepException: Exception()
-    
     enum class Flag {
         EMPTY, MINE
     }
