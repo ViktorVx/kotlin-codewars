@@ -32,6 +32,8 @@ class MineSweeper(board: String, nMines: Int) {
         return vfArrToStr(vfArr)
     }
 
+    // todo Модифицировать вероятностный алгоритм для определения неразрешимых случаев
+
     private fun analyseProbArray(probArr: Array<IntArray>): Step? {
         var maxVal = 0
         var maxX = 0
