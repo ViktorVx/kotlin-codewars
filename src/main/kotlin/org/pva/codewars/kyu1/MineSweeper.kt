@@ -20,7 +20,7 @@ class MineSweeper(board: String, nMines: Int) {
                 if (checkClearField(vfArr)) break
 
                 probabilityAlgorithm(vfArr, probArr)
-                step = analyseProbArray(probArr, vfArr)
+                step = analyseProbArray(probArr)
                 if (step == null) return "?"
 
                 makeStep(step, vfArr)
@@ -32,7 +32,7 @@ class MineSweeper(board: String, nMines: Int) {
         return vfArrToStr(vfArr)
     }
 
-    private fun analyseProbArray(probArr: Array<IntArray>, vfArr: ArrayList<CharArray>): Step? {
+    private fun analyseProbArray(probArr: Array<IntArray>): Step? {
         var maxVal = 0
         var maxX = 0
         var maxY = 0
@@ -40,7 +40,6 @@ class MineSweeper(board: String, nMines: Int) {
         var allHaveSameProbability = true
         for ((indX, _) in probArr.iterator().withIndex()) {
             for ((indY, y) in probArr[indX].iterator().withIndex()) {
-                if (y == 0 && vfArr[indX][indY] == '?') return null
                 if (y == 0) continue
 
                 if (average == 0) average = y
