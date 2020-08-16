@@ -2,15 +2,10 @@ package org.pva.KotlinCodewars.kyu1
 
 import kotlin.Array as Array
 
-class MineSweeper(val board: String, val nMines: Int) {
+class MineSweeper(board: String, nMines: Int) {
 
-    var vfStr = """? ? ? ? ? ?
-                  |? ? ? ? ? ?
-                  |? ? ? 0 ? ?
-                  |? ? ? ? ? ?
-                  |? ? ? ? ? ?
-                  |0 0 0 ? ? ?""".trimMargin()
-    val nMns = 6
+    var vfStr:String = board
+    val nMns = nMines
     var findedMines = 0
 
     fun solve(): String {
@@ -26,7 +21,8 @@ class MineSweeper(val board: String, val nMines: Int) {
 
                 probabilityAlgorithm(vfArr, probArr)
                 step = analyseProbArray(probArr)
-                if (step == null) break
+                if (step == null) return "?"
+//                if (step == null) return vfArrToStr(vfArr)
 
                 makeStep(step, vfArr)
             } else {
@@ -37,13 +33,13 @@ class MineSweeper(val board: String, val nMines: Int) {
         return vfArrToStr(vfArr)
     }
 
-    private fun analyseProbArray(probArr: kotlin.Array<IntArray>): Step? {
+    private fun analyseProbArray(probArr: Array<IntArray>): Step? {
         var maxVal = 0
         var maxX = 0
         var maxY = 0
         var average = 0
         var allHaveSameProbability = true
-        for ((indX, x) in probArr.iterator().withIndex()) {
+        for ((indX, _) in probArr.iterator().withIndex()) {
             for ((indY, y) in probArr[indX].iterator().withIndex()) {
                 if (y == 0) continue
 
@@ -74,12 +70,16 @@ class MineSweeper(val board: String, val nMines: Int) {
     private fun simpleAlgorithm(arr: ArrayList<CharArray>): Step? {
         for ((indX, _) in arr.iterator().withIndex()) {
             loop@ for ((indY, y) in arr[indX].iterator().withIndex()) {
-                if (findedMines == nMns) return chooseAnyEmpty(indX, indY, arr, Flag.EMPTY)
+                if (findedMines == nMns) {
+                    val step = chooseAnyEmpty (indX, indY, arr, Flag.EMPTY)
+                    if (step == null) continue
+                    return step
+                }
                 when(y) {
                     '?', 'x' -> continue@loop
                     else -> {
                         val cellValue = Character.getNumericValue(y)
-                        var map = mutableMapOf("unknown" to 0, "mines" to 0)
+                        val map = mutableMapOf("unknown" to 0, "mines" to 0)
                         if (indX != 0 && indY != 0) countSurrounding(arr[indX - 1][indY - 1], map)
                         if (indX != 0) countSurrounding(arr[indX - 1][indY], map)
                         if (indX != 0 && indY != arr[0].size - 1) countSurrounding(arr[indX - 1][indY + 1], map)
@@ -111,7 +111,7 @@ class MineSweeper(val board: String, val nMines: Int) {
         return null
     }
 
-    private fun probabilityAlgorithm(arr: ArrayList<CharArray>, probArr: kotlin.Array<IntArray>): Step? {
+    private fun probabilityAlgorithm(arr: ArrayList<CharArray>, probArr: Array<IntArray>): Step? {
         for ((indX, _) in arr.iterator().withIndex()) {
             loop@ for ((indY, y) in arr[indX].iterator().withIndex()) {
                 if (findedMines == nMns) return chooseAnyEmpty(indX, indY, arr, Flag.EMPTY)
@@ -119,7 +119,7 @@ class MineSweeper(val board: String, val nMines: Int) {
                     '?', 'x' -> continue@loop
                     else -> {
                         val cellValue = Character.getNumericValue(y)
-                        var map = mutableMapOf("unknown" to 0, "mines" to 0)
+                        val map = mutableMapOf("unknown" to 0, "mines" to 0)
                         if (indX != 0 && indY != 0) countSurrounding(arr[indX - 1][indY - 1], map)
                         if (indX != 0) countSurrounding(arr[indX - 1][indY], map)
                         if (indX != 0 && indY != arr[0].size - 1) countSurrounding(arr[indX - 1][indY + 1], map)
@@ -165,8 +165,8 @@ class MineSweeper(val board: String, val nMines: Int) {
     }
 
     private fun checkClearField(visible: ArrayList<CharArray>): Boolean {
-        for ((indX, x) in visible.iterator().withIndex()) {
-            for ((indY, y) in visible[indX].iterator().withIndex()) {
+        for ((indX, _) in visible.iterator().withIndex()) {
+            for (y in visible[indX].iterator()) {
                 if (y == '?') return false
             }
         }

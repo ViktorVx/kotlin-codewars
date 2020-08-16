@@ -13,9 +13,7 @@ class Game {
 
         @JvmStatic fun newGame(arr:String) {
             rfStr = arr
-        }
-
-        @JvmStatic fun read(arr:String) {
+            minesN = rfStr.toCharArray().filter { it == 'x' }.count()
         }
 
         private fun vfStrToArr(str:String): ArrayList<CharArray> {
