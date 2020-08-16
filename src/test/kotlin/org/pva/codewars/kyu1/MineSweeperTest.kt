@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 
 class MineSweeperTest {
 
-    private val DATA = arrayOf(// Sample Tests:
+    private val data = arrayOf(// Sample Tests:
             arrayOf("Simple map 1",
                     """1 x 1 1 x 1
                       |2 2 2 1 2 2
@@ -156,9 +156,9 @@ class MineSweeperTest {
 
     @Test
     fun sampleTests() {
-        for (count in DATA.indices) {
-            Game.newGame(DATA[count][1])
-            makeAssertionAndDisplay(DATA[count][0], DATA[count][3], MineSweeper(DATA[count][2], Game.minesN).solve())
+        for (count in data.indices) {
+            Game.newGame(data[count][1])
+            makeAssertionAndDisplay(data[count][0], data[count][3], MineSweeper(data[count][2], Game.minesN).solve())
         }
     }
 }
