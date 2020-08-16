@@ -163,9 +163,7 @@ class MineSweeper(board: String, nMines: Int) {
 
     private fun checkClearField(visible: ArrayList<CharArray>): Boolean {
         for ((indX, _) in visible.iterator().withIndex()) {
-            for (y in visible[indX].iterator()) {
-                if (y == '?') return false
-            }
+            for (y in visible[indX].iterator()) if (y == '?') return false
         }
         return true
     }
