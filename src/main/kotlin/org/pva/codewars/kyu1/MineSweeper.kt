@@ -16,13 +16,12 @@ class MineSweeper(board: String, nMines: Int) {
         while (true) {
             var step = simpleAlgorithm(vfArr)
             if (step == null) {
-                //****************** Probability algorithm ******************
                 if (checkClearField(vfArr)) break
-
+                //****************** Probability algorithm ******************
                 probabilityAlgorithm(vfArr, probArr)
                 step = analyseProbArray(probArr)
                 if (step == null) return "?"
-
+                //***********************************************************
                 makeStep(step, vfArr)
             } else {
                 makeStep(step, vfArr)
@@ -32,13 +31,22 @@ class MineSweeper(board: String, nMines: Int) {
         return vfArrToStr(vfArr)
     }
 
+    // todo реализовать алгоритм перебора возможных комбинаций размещения мин на поле (вместо вероятностного алгоритма)
+    //  если оказывается, что вариант м.б. только один - то это и есть решение
+    //  если вариантов размещения несколько, то поле неразрешимо
+    //  Реализация:
+    //  1) Цикл по всем неизвестным ячейкам:
+    //      1.1) Проставить мину в неизвестную ГРАНИЧНУЮ! ячейку
+    //      1.2) Попробавть решить поле, если решение есть - запомнить координаты проставленных мин
+    //  2) Если существует только один уникальный набор координат, то это и есть решение
+
     private fun analyseProbArray(probArr: Array<IntArray>): Step? {
         var maxVal = 0
         var maxX = 0
         var maxY = 0
         var average = 0
         var allHaveSameProbability = true
-        for ((indX, _) in probArr.iterator().withIndex()) {
+        for (indX in probArr.indices) {
             for ((indY, y) in probArr[indX].iterator().withIndex()) {
                 if (y == 0) continue
 
@@ -67,7 +75,7 @@ class MineSweeper(board: String, nMines: Int) {
     }
 
     private fun simpleAlgorithm(arr: ArrayList<CharArray>): Step? {
-        for ((indX, _) in arr.iterator().withIndex()) {
+        for (indX in arr.indices) {
             loop@ for ((indY, y) in arr[indX].iterator().withIndex()) {
                 if (foundMines == nMns) {
                     return chooseAnyEmpty (indX, indY, arr, Flag.EMPTY) ?: continue
@@ -109,7 +117,7 @@ class MineSweeper(board: String, nMines: Int) {
     }
 
     private fun probabilityAlgorithm(arr: ArrayList<CharArray>, probArr: Array<IntArray>): Step? {
-        for ((indX, _) in arr.iterator().withIndex()) {
+        for (indX in arr.indices) {
             loop@ for ((indY, y) in arr[indX].iterator().withIndex()) {
                 if (foundMines == nMns) return chooseAnyEmpty(indX, indY, arr, Flag.EMPTY)
                 when(y) {
@@ -162,7 +170,7 @@ class MineSweeper(board: String, nMines: Int) {
     }
 
     private fun checkClearField(visible: ArrayList<CharArray>): Boolean {
-        for ((indX, _) in visible.iterator().withIndex()) {
+        for (indX in visible.indices) {
             for (y in visible[indX].iterator()) if (y == '?') return false
         }
         return true
