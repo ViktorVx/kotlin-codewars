@@ -1,4 +1,4 @@
-package org.pva.KotlinCodewars.kyu1
+package org.pva.codewars.kyu1
 
 class Game {
 

@@ -1,12 +1,12 @@
-package org.pva.KotlinCodewars.kyu1
+package org.pva.codewars.kyu1
 
 import kotlin.Array as Array
 
 class MineSweeper(board: String, nMines: Int) {
 
-    var vfStr:String = board
-    val nMns = nMines
-    var findedMines = 0
+    private var vfStr = board
+    private val nMns = nMines
+    private var foundMines = 0
 
     fun solve(): String {
         val vfArr = vfStrToArr(vfStr)
@@ -22,7 +22,6 @@ class MineSweeper(board: String, nMines: Int) {
                 probabilityAlgorithm(vfArr, probArr)
                 step = analyseProbArray(probArr)
                 if (step == null) return "?"
-//                if (step == null) return vfArrToStr(vfArr)
 
                 makeStep(step, vfArr)
             } else {
@@ -70,10 +69,8 @@ class MineSweeper(board: String, nMines: Int) {
     private fun simpleAlgorithm(arr: ArrayList<CharArray>): Step? {
         for ((indX, _) in arr.iterator().withIndex()) {
             loop@ for ((indY, y) in arr[indX].iterator().withIndex()) {
-                if (findedMines == nMns) {
-                    val step = chooseAnyEmpty (indX, indY, arr, Flag.EMPTY)
-                    if (step == null) continue
-                    return step
+                if (foundMines == nMns) {
+                    return chooseAnyEmpty (indX, indY, arr, Flag.EMPTY) ?: continue
                 }
                 when(y) {
                     '?', 'x' -> continue@loop
@@ -89,9 +86,9 @@ class MineSweeper(board: String, nMines: Int) {
                         if (indX != arr.size - 1 && indY != 0) countSurrounding(arr[indX + 1][indY - 1], map)
                         if (indY != 0) countSurrounding(arr[indX][indY - 1], map)
 
-                        if (map.get("unknown") == 0) continue@loop
-                        if (cellValue == map.get("mines")) return chooseAnyEmpty(indX, indY, arr, Flag.EMPTY)
-                        if (map.get("unknown") == cellValue - map.get("mines")!!) return chooseAnyEmpty(indX, indY, arr, Flag.MINE)
+                        if (map["unknown"] == 0) continue@loop
+                        if (cellValue == map["mines"]) return chooseAnyEmpty(indX, indY, arr, Flag.EMPTY)
+                        if (map["unknown"] == cellValue - map["mines"]!!) return chooseAnyEmpty(indX, indY, arr, Flag.MINE)
                     }
                 }
             }
@@ -114,7 +111,7 @@ class MineSweeper(board: String, nMines: Int) {
     private fun probabilityAlgorithm(arr: ArrayList<CharArray>, probArr: Array<IntArray>): Step? {
         for ((indX, _) in arr.iterator().withIndex()) {
             loop@ for ((indY, y) in arr[indX].iterator().withIndex()) {
-                if (findedMines == nMns) return chooseAnyEmpty(indX, indY, arr, Flag.EMPTY)
+                if (foundMines == nMns) return chooseAnyEmpty(indX, indY, arr, Flag.EMPTY)
                 when(y) {
                     '?', 'x' -> continue@loop
                     else -> {
@@ -129,8 +126,8 @@ class MineSweeper(board: String, nMines: Int) {
                         if (indX != arr.size - 1 && indY != 0) countSurrounding(arr[indX + 1][indY - 1], map)
                         if (indY != 0) countSurrounding(arr[indX][indY - 1], map)
 
-                        if (map.get("unknown") == 0) continue@loop
-                        val probability = 100 / map.get("unknown")!! * (cellValue - map.get("mines")!!)
+                        if (map["unknown"] == 0) continue@loop
+                        val probability = 100 / map["unknown"]!! * (cellValue - map["mines"]!!)
 
                         if (indX != 0 && indY != 0 && arr[indX - 1][indY - 1] == '?') probArr[indX - 1][indY - 1]+=probability
                         if (indX != 0 && arr[indX - 1][indY] == '?') probArr[indX - 1][indY]+=probability
@@ -152,15 +149,15 @@ class MineSweeper(board: String, nMines: Int) {
             Flag.EMPTY -> visible[step.x][step.y] = "${Game.open(step.x, step.y)}".toCharArray()[0]
             Flag.MINE -> {
                 visible[step.x][step.y] = 'x'
-                findedMines++
+                foundMines++
             }
         }
     }
 
     private fun countSurrounding(arrVal:Char, map:MutableMap<String, Int>) {
         when (arrVal) {
-            '?' -> map.get("unknown")?.let { map.put("unknown", it +1) }
-            'x' -> map.get("mines")?.let { map.put("mines", it + 1) }
+            '?' -> map["unknown"]?.let { map.put("unknown", it +1) }
+            'x' -> map["mines"]?.let { map.put("mines", it + 1) }
         }
     }
 
