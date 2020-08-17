@@ -41,6 +41,18 @@ class MineSweeper(board: String, nMines: Int) {
     //      3.1) Проставляем мины на координаты в соответствии с перестановками
     //      3.2) Если поле решается - запоминаем координаты проставленных мин
     //  4) Если существует больше 2х наборов решений - тогда поле неразрешимо, инача - решаем поле
+    //  !!! Проверять на то, что хотя бы одна мина попадает на граничные ячейки с вероятностями
+
+    private fun bruteForceAlgorithm(vfArr: ArrayList<CharArray>) {
+        var unknownCoords = mutableListOf<Pair<Int, Int>>()
+        // Collect unknown cells
+        for (indX in vfArr.indices) {
+            for ((indY, y) in vfArr[indX].iterator().withIndex()) {
+                if (y == '?') unknownCoords.add(Pair(indX, indY))
+            }
+        }
+        // Collect
+    }
 
     private fun analyseProbArray(probArr: Array<IntArray>): Step? {
         var maxVal = 0
