@@ -156,7 +156,7 @@ class MineSweeperTest {
 
     @Test
     fun sampleTests() {
-        Permutation.show(2, 6)
+        Permutation.show(3, 6)
 //        for (count in data.indices) {
 //            Game.newGame(data[count][1])
 //            makeAssertionAndDisplay(data[count][0], data[count][3], MineSweeper(data[count][2], Game.minesN).solve())
