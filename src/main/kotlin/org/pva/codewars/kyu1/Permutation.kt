@@ -6,26 +6,40 @@ class Permutation {
 
         // todo реализовать алгоритм генерации сочетаний без повторений
         @JvmStatic fun show(mines:Int, cells:Int) {
-//            val alphabet = (0 until cells).toList().toMutableList()
-//            println(alphabet.subList(0, mines))
-//            var i = mines - 1
-//            while (true) {
-//                if (alphabet[i] < cells - mines + i + 1) {
-//                    alphabet[i] += 1
-//                    for (j in i + 1 until mines) {
-//                        alphabet[j] = alphabet[j-1] + 1
-//                        println(alphabet.subList(0, mines))
-//                        i = mines
-//                    }
-//                }
-//                i--
-//                if (i == -1) break
-//            }
-            val alphabet = (0 until cells).toList().toMutableList()
-            var res = mutableListOf<IntArray>()
-
+            getNextNum(mines, cells)
         }
 
-        private fun getNextNum(alphabet:MutableList<>)
+        private fun getNextNum(mines:Int, cells:Int) {
+            val alphabet = (0 until cells).toList().toMutableList()
+            println(alphabet)
+            val array = Array(f(cells)/(f(cells - mines) * f(mines))) { IntArray(mines) {0} }
+
+            for (i in 1 until mines) {
+                array[0][i] = alphabet[i]
+            }
+
+
+            for ((i, c) in array.iterator().withIndex()) {
+                if (i == 0) continue
+                for (j in mines - 1 downTo 0) {
+                    if (j == mines - 1) {
+                        if (array[i - 1][j] == alphabet.max()) {
+                            c[j - 1] = array[i - 1][j - 1] + 1
+                            c[j] = c[j - 1] + 1
+                        } else {
+                            c[j] = array[i - 1][j] + 1
+                        }
+                    } else {
+                        if (c[j] < array[i - 1][j]) c[j] = array[i - 1][j]
+                    }
+                }
+            }
+        }
+
+        private fun f(n: Int): Int {
+            var res = 1
+            for (i in 1..n) res *= i
+            return res
+        }
     }
 }
