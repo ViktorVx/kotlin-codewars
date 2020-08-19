@@ -18,11 +18,13 @@ class MineSweeper(board: String, nMines: Int) {
             if (step == null) {
                 if (checkClearField(vfArr)) break
                 //****************** Probability algorithm ******************
-                probabilityAlgorithm(vfArr, probArr)
-                step = analyseProbArray(probArr)
-                if (step == null) return "?"
+//                probabilityAlgorithm(vfArr, probArr)
+//                step = analyseProbArray(probArr)
+//                if (step == null) return "?"
+                bruteForceAlgorithm(vfArr)
+                break //!!!!
                 //***********************************************************
-                makeStep(step, vfArr)
+//                makeStep(step, vfArr)
             } else {
                 makeStep(step, vfArr)
             }
@@ -52,14 +54,25 @@ class MineSweeper(board: String, nMines: Int) {
             }
         }
         // Collect probable combinations of mines dislocation
-        val combinations = mutableListOf<Array<Int?>>()
-        combinations((0 until unknownCoords.size).toList().toIntArray(), nMns, 0, arrayOfNulls(nMns), combinations)
-//        for (re in combinations) {
-//            println(re.contentToString())
-//        }
+        val combinations = mutableListOf<IntArray>()
+        combinations((0 until unknownCoords.size).toList().toIntArray(), nMns - foundMines, 0,
+                IntArray(nMns - foundMines) { 0 }, combinations)
+        for (re in combinations) {
+            val caseField = mutableListOf<CharArray>()
+            for (c in vfArr) {
+                caseField.add(c.clone())
+            }
+
+            println(re.contentToString())
+            for (i in re) {
+                makeStep(Step(unknownCoords[i].first, unknownCoords[i].second, Flag.MINE), caseField)
+                println("=====================")
+                printVfArr(caseField)
+            }
+        }
     }
 
-    private fun combinations(arr: IntArray, len: Int, startPosition: Int, result: Array<Int?>, res: MutableList<Array<Int?>>) {
+    private fun combinations(arr: IntArray, len: Int, startPosition: Int, result: IntArray, res: MutableList<IntArray>) {
         if (len == 0) {
             res.add(result.clone())
             return
@@ -100,7 +113,7 @@ class MineSweeper(board: String, nMines: Int) {
                 .toCollection(arrayListOf())
     }
 
-    private fun vfArrToStr(arr: ArrayList<CharArray>): String {
+    private fun vfArrToStr(arr: MutableList<CharArray>): String {
         return arr.joinToString("\n") { it.joinToString(" ") }
     }
 
@@ -182,7 +195,7 @@ class MineSweeper(board: String, nMines: Int) {
         return null
     }
 
-    private fun makeStep(step: Step, visible: ArrayList<CharArray>) {
+    private fun makeStep(step: Step, visible: MutableList<CharArray>) {
         when(step.flag) {
             Flag.EMPTY -> visible[step.x][step.y] = "${Game.open(step.x, step.y)}".toCharArray()[0]
             Flag.MINE -> {
@@ -206,7 +219,7 @@ class MineSweeper(board: String, nMines: Int) {
         return true
     }
 
-    private fun printVfArr(arr: ArrayList<CharArray>) {
+    private fun printVfArr(arr: MutableList<CharArray>) {
         println(vfArrToStr(arr))
         println("*".repeat(arr[0].size * 2 - 1))
     }
