@@ -35,8 +35,8 @@ class MineSweeper(board: String, nMines: Int) {
     //  если оказывается, что вариант м.б. только один - то это и есть решение
     //  если вариантов размещения несколько, то поле неразрешимо
     //  Реализация:
-    //  1) Собрать все неизвествные ячейки
-    //  2) Создать список перестановок неизвестных ячеек по колучеству оставшихся мин
+    //  1) +++Собрать все неизвествные ячейки
+    //  2) +++Создать список перестановок неизвестных ячеек по колучеству оставшихся мин
     //  3) Запустить обход составленных перестановок
     //      3.1) Проставляем мины на координаты в соответствии с перестановками
     //      3.2) Если поле решается - запоминаем координаты проставленных мин
@@ -44,14 +44,30 @@ class MineSweeper(board: String, nMines: Int) {
     //  !!! Проверять на то, что хотя бы одна мина попадает на граничные ячейки с вероятностями
 
     private fun bruteForceAlgorithm(vfArr: ArrayList<CharArray>) {
-        var unknownCoords = mutableListOf<Pair<Int, Int>>()
+        val unknownCoords = mutableListOf<Pair<Int, Int>>()
         // Collect unknown cells
         for (indX in vfArr.indices) {
             for ((indY, y) in vfArr[indX].iterator().withIndex()) {
                 if (y == '?') unknownCoords.add(Pair(indX, indY))
             }
         }
-        // Collect
+        // Collect probable combinations of mines dislocation
+        val combinations = mutableListOf<Array<Int?>>()
+        combinations((0 until unknownCoords.size).toList().toIntArray(), nMns, 0, arrayOfNulls(nMns), combinations)
+//        for (re in combinations) {
+//            println(re.contentToString())
+//        }
+    }
+
+    private fun combinations(arr: IntArray, len: Int, startPosition: Int, result: Array<Int?>, res: MutableList<Array<Int?>>) {
+        if (len == 0) {
+            res.add(result.clone())
+            return
+        }
+        for (i in startPosition..arr.size - len) {
+            result[result.size - len] = arr[i]
+            combinations(arr, len - 1, i + 1, result, res)
+        }
     }
 
     private fun analyseProbArray(probArr: Array<IntArray>): Step? {
