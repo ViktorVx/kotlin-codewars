@@ -1,12 +1,12 @@
 package org.pva.codewars.kyu1
 
-import kotlin.Array as Array
-
 class MineSweeper(board: String, nMines: Int) {
 
     private var vfStr = board
     private val nMns = nMines
     private var foundMines = 0
+
+    //todo SpeedUp
 
     fun solve(): String {
         val vfArr = vfStrToArr(vfStr)
@@ -27,20 +27,7 @@ class MineSweeper(board: String, nMines: Int) {
         return vfArrToStr(vfArr)
     }
 
-    // todo реализовать алгоритм перебора возможных комбинаций размещения мин на поле (вместо вероятностного алгоритма)
-    //  если оказывается, что вариант м.б. только один - то это и есть решение
-    //  если вариантов размещения несколько, то поле неразрешимо
-    //  Реализация:
-    //  1) +++Собрать все неизвествные ячейки
-    //  2) +++Создать список перестановок неизвестных ячеек по колучеству оставшихся мин
-    //  3) +++Запустить обход составленных перестановок
-    //      3.1) +++ Проставляем мины на координаты в соответствии с перестановками
-    //      3.2) +++Если поле решается - запоминаем координаты проставленных мин
-    //  4) Если существует больше 2х наборов решений - тогда поле неразрешимо, инача - решаем поле
-    //  !!! Проверять на то, что хотя бы одна мина попадает на граничные ячейки с вероятностями
-
     private fun bruteForceAlgorithm(vfArr: ArrayList<CharArray>):String {
-        println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
         val unknownCoords = mutableListOf<Pair<Int, Int>>()
         // Collect unknown cells
         for (indX in vfArr.indices) {
@@ -59,7 +46,6 @@ class MineSweeper(board: String, nMines: Int) {
                 caseField.add(c.clone())
             }
             //******
-            println(re.contentToString())
             for (i in re) {
                 makeStep(Step(unknownCoords[i].first, unknownCoords[i].second, Flag.MINE), caseField, true)
             }
@@ -79,7 +65,6 @@ class MineSweeper(board: String, nMines: Int) {
             }
         }
 
-        println(successCase)
         for (ints in successCase[0]) {
             makeStep(Step(unknownCoords[ints].first, unknownCoords[ints].second, Flag.MINE), vfArr, true)
         }
@@ -156,14 +141,7 @@ class MineSweeper(board: String, nMines: Int) {
                     else -> {
                         val cellValue = Character.getNumericValue(y)
                         val map = mutableMapOf("unknown" to 0, "mines" to 0)
-                        if (indX != 0 && indY != 0) countSurrounding(arr[indX - 1][indY - 1], map)
-                        if (indX != 0) countSurrounding(arr[indX - 1][indY], map)
-                        if (indX != 0 && indY != arr[0].size - 1) countSurrounding(arr[indX - 1][indY + 1], map)
-                        if (indY != arr[0].size - 1) countSurrounding(arr[indX][indY + 1], map)
-                        if (indX != arr.size - 1 && indY != arr[0].size - 1) countSurrounding(arr[indX + 1][indY + 1], map)
-                        if (indX != arr.size - 1) countSurrounding(arr[indX + 1][indY], map)
-                        if (indX != arr.size - 1 && indY != 0) countSurrounding(arr[indX + 1][indY - 1], map)
-                        if (indY != 0) countSurrounding(arr[indX][indY - 1], map)
+                        countCellStatistics(arr, indX, indY, map)
 
                         if (cellValue < map["mines"]!!) return false
                         if (map["unknown"] == 0 && cellValue != map["mines"]) return false
@@ -175,6 +153,17 @@ class MineSweeper(board: String, nMines: Int) {
             }
         }
         return true
+    }
+
+    private fun countCellStatistics(arr: MutableList<CharArray>, indX: Int, indY: Int, map:MutableMap<String, Int>) {
+        if (indX != 0 && indY != 0) countSurrounding(arr[indX - 1][indY - 1], map)
+        if (indX != 0) countSurrounding(arr[indX - 1][indY], map)
+        if (indX != 0 && indY != arr[0].size - 1) countSurrounding(arr[indX - 1][indY + 1], map)
+        if (indY != arr[0].size - 1) countSurrounding(arr[indX][indY + 1], map)
+        if (indX != arr.size - 1 && indY != arr[0].size - 1) countSurrounding(arr[indX + 1][indY + 1], map)
+        if (indX != arr.size - 1) countSurrounding(arr[indX + 1][indY], map)
+        if (indX != arr.size - 1 && indY != 0) countSurrounding(arr[indX + 1][indY - 1], map)
+        if (indY != 0) countSurrounding(arr[indX][indY - 1], map)
     }
 
     private fun chooseAnyEmpty(indX: Int, indY: Int, arr: MutableList<CharArray>, flag: Flag): Step? {
@@ -193,19 +182,8 @@ class MineSweeper(board: String, nMines: Int) {
         when(step.flag) {
             Flag.EMPTY -> {
                 if (checkCase) {
-                    val indX = step.x
-                    val indY = step.y
-                    val arr = visible
                     val map = mutableMapOf("unknown" to 0, "mines" to 0)
-                    if (indX != 0 && indY != 0) countSurrounding(arr[indX - 1][indY - 1], map)
-                    if (indX != 0) countSurrounding(arr[indX - 1][indY], map)
-                    if (indX != 0 && indY != arr[0].size - 1) countSurrounding(arr[indX - 1][indY + 1], map)
-                    if (indY != arr[0].size - 1) countSurrounding(arr[indX][indY + 1], map)
-                    if (indX != arr.size - 1 && indY != arr[0].size - 1) countSurrounding(arr[indX + 1][indY + 1], map)
-                    if (indX != arr.size - 1) countSurrounding(arr[indX + 1][indY], map)
-                    if (indX != arr.size - 1 && indY != 0) countSurrounding(arr[indX + 1][indY - 1], map)
-                    if (indY != 0) countSurrounding(arr[indX][indY - 1], map)
-
+                    countCellStatistics(visible, step.x, step.y, map)
                     visible[step.x][step.y] = "${map["mines"]}".toCharArray()[0]
                 } else {
                     visible[step.x][step.y] = "${Game.open(step.x, step.y)}".toCharArray()[0]
@@ -226,9 +204,8 @@ class MineSweeper(board: String, nMines: Int) {
     }
 
     private fun checkClearField(visible: MutableList<CharArray>): Boolean {
-        for (indX in visible.indices) {
+        for (indX in visible.indices)
             for (y in visible[indX].iterator()) if (y == '?') return false
-        }
         return true
     }
 
