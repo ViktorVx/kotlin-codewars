@@ -10,23 +10,17 @@ class MineSweeper(board: String, nMines: Int) {
 
     fun solve(): String {
         val vfArr = vfStrToArr(vfStr)
-        val probArr = Array(vfArr.size) { IntArray(vfArr[0].size) }
         printVfArr(vfArr)
         //****************** Simple algorithm ******************
         while (true) {
-            var step = simpleAlgorithm(vfArr)
+            var step = simpleAlgorithm(vfArr, false)
             if (step == null) {
                 if (checkClearField(vfArr)) break
                 //****************** Probability algorithm ******************
-//                probabilityAlgorithm(vfArr, probArr)
-//                step = analyseProbArray(probArr)
-//                if (step == null) return "?"
-                bruteForceAlgorithm(vfArr)
-                break //!!!!
+                return bruteForceAlgorithm(vfArr)
                 //***********************************************************
-//                makeStep(step, vfArr)
             } else {
-                makeStep(step, vfArr)
+                makeStep(step, vfArr,false)
             }
             printVfArr(vfArr)
         }
@@ -39,13 +33,14 @@ class MineSweeper(board: String, nMines: Int) {
     //  Реализация:
     //  1) +++Собрать все неизвествные ячейки
     //  2) +++Создать список перестановок неизвестных ячеек по колучеству оставшихся мин
-    //  3) Запустить обход составленных перестановок
-    //      3.1) Проставляем мины на координаты в соответствии с перестановками
-    //      3.2) Если поле решается - запоминаем координаты проставленных мин
+    //  3) +++Запустить обход составленных перестановок
+    //      3.1) +++ Проставляем мины на координаты в соответствии с перестановками
+    //      3.2) +++Если поле решается - запоминаем координаты проставленных мин
     //  4) Если существует больше 2х наборов решений - тогда поле неразрешимо, инача - решаем поле
     //  !!! Проверять на то, что хотя бы одна мина попадает на граничные ячейки с вероятностями
 
-    private fun bruteForceAlgorithm(vfArr: ArrayList<CharArray>) {
+    private fun bruteForceAlgorithm(vfArr: ArrayList<CharArray>):String {
+        println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
         val unknownCoords = mutableListOf<Pair<Int, Int>>()
         // Collect unknown cells
         for (indX in vfArr.indices) {
@@ -57,19 +52,47 @@ class MineSweeper(board: String, nMines: Int) {
         val combinations = mutableListOf<IntArray>()
         combinations((0 until unknownCoords.size).toList().toIntArray(), nMns - foundMines, 0,
                 IntArray(nMns - foundMines) { 0 }, combinations)
+        val successCase = mutableListOf<IntArray>()
         for (re in combinations) {
             val caseField = mutableListOf<CharArray>()
             for (c in vfArr) {
                 caseField.add(c.clone())
             }
-
+            //******
             println(re.contentToString())
             for (i in re) {
-                makeStep(Step(unknownCoords[i].first, unknownCoords[i].second, Flag.MINE), caseField)
-                println("=====================")
-                printVfArr(caseField)
+                makeStep(Step(unknownCoords[i].first, unknownCoords[i].second, Flag.MINE), caseField, true)
+            }
+            //******
+            while (true) {
+                if (checkClearField(caseField) && checkValidField(caseField)) {
+                    successCase.add(re)
+                    if (successCase.size > 1) return "?"
+                    break
+                }
+
+                var step = simpleAlgorithm(caseField, true)
+                if (step == null || step.flag == Flag.MINE) {
+                    break
+                }
+                makeStep(step, caseField, true)
             }
         }
+
+        println(successCase)
+        for (ints in successCase[0]) {
+            makeStep(Step(unknownCoords[ints].first, unknownCoords[ints].second, Flag.MINE), vfArr, true)
+        }
+        //****************** Simple algorithm ******************
+        while (true) {
+            var step = simpleAlgorithm(vfArr, false)
+            if (step == null) {
+                if (checkClearField(vfArr)) break
+            } else {
+                makeStep(step, vfArr, true)
+            }
+        }
+        return vfArrToStr(vfArr)
     }
 
     private fun combinations(arr: IntArray, len: Int, startPosition: Int, result: IntArray, res: MutableList<IntArray>) {
@@ -83,30 +106,6 @@ class MineSweeper(board: String, nMines: Int) {
         }
     }
 
-    private fun analyseProbArray(probArr: Array<IntArray>): Step? {
-        var maxVal = 0
-        var maxX = 0
-        var maxY = 0
-        var average = 0
-        var allHaveSameProbability = true
-        for (indX in probArr.indices) {
-            for ((indY, y) in probArr[indX].iterator().withIndex()) {
-                if (y == 0) continue
-
-                if (average == 0) average = y
-                if (average != y) allHaveSameProbability = false
-
-                if (maxVal < y) {
-                    maxVal = y
-                    maxX = indX
-                    maxY = indY
-                }
-            }
-        }
-        return if (allHaveSameProbability) null else Step(maxX, maxY, Flag.MINE)
-
-    }
-
     private fun vfStrToArr(str:String): ArrayList<CharArray> {
         return str.lines()
                 .map { it.replace(Regex("\\s"), "").toCharArray() }
@@ -117,10 +116,10 @@ class MineSweeper(board: String, nMines: Int) {
         return arr.joinToString("\n") { it.joinToString(" ") }
     }
 
-    private fun simpleAlgorithm(arr: ArrayList<CharArray>): Step? {
+    private fun simpleAlgorithm(arr: MutableList<CharArray>, checkCase:Boolean): Step? {
         for (indX in arr.indices) {
             loop@ for ((indY, y) in arr[indX].iterator().withIndex()) {
-                if (foundMines == nMns) {
+                if (foundMines == nMns && !checkCase) {
                     return chooseAnyEmpty (indX, indY, arr, Flag.EMPTY) ?: continue
                 }
                 when(y) {
@@ -137,6 +136,8 @@ class MineSweeper(board: String, nMines: Int) {
                         if (indX != arr.size - 1 && indY != 0) countSurrounding(arr[indX + 1][indY - 1], map)
                         if (indY != 0) countSurrounding(arr[indX][indY - 1], map)
 
+                        if (cellValue < map["mines"]!!) return null
+                        if (map["unknown"] == 0 && cellValue != map["mines"]) return null
                         if (map["unknown"] == 0) continue@loop
                         if (cellValue == map["mines"]) return chooseAnyEmpty(indX, indY, arr, Flag.EMPTY)
                         if (map["unknown"] == cellValue - map["mines"]!!) return chooseAnyEmpty(indX, indY, arr, Flag.MINE)
@@ -147,22 +148,9 @@ class MineSweeper(board: String, nMines: Int) {
         return null
     }
 
-    private fun chooseAnyEmpty(indX: Int, indY: Int, arr: ArrayList<CharArray>, flag: Flag): Step? {
-        if (indX != 0 && indY != 0 && arr[indX - 1][indY - 1] == '?') return Step(indX - 1, indY - 1, flag)
-        if (indX != 0 && arr[indX - 1][indY] == '?') return Step(indX - 1, indY, flag)
-        if (indX != 0 && indY != arr[0].size - 1 && arr[indX - 1][indY + 1] == '?') return Step(indX - 1, indY + 1, flag)
-        if (indY != arr[0].size - 1 && arr[indX][indY + 1] == '?') return Step(indX, indY + 1, flag)
-        if (indX != arr.size - 1 && indY != arr[0].size - 1 && arr[indX + 1][indY + 1] == '?') return Step(indX + 1, indY + 1, flag)
-        if (indX != arr.size - 1 && arr[indX + 1][indY] == '?') return Step(indX + 1, indY, flag)
-        if (indX != arr.size - 1 && indY != 0 && arr[indX + 1][indY - 1] == '?') return Step(indX + 1, indY - 1, flag)
-        if (indY != 0 && arr[indX][indY - 1] == '?') return Step(indX, indY - 1, flag)
-        return null
-    }
-
-    private fun probabilityAlgorithm(arr: ArrayList<CharArray>, probArr: Array<IntArray>): Step? {
+    private fun checkValidField(arr: MutableList<CharArray>): Boolean {
         for (indX in arr.indices) {
             loop@ for ((indY, y) in arr[indX].iterator().withIndex()) {
-                if (foundMines == nMns) return chooseAnyEmpty(indX, indY, arr, Flag.EMPTY)
                 when(y) {
                     '?', 'x' -> continue@loop
                     else -> {
@@ -177,27 +165,52 @@ class MineSweeper(board: String, nMines: Int) {
                         if (indX != arr.size - 1 && indY != 0) countSurrounding(arr[indX + 1][indY - 1], map)
                         if (indY != 0) countSurrounding(arr[indX][indY - 1], map)
 
+                        if (cellValue < map["mines"]!!) return false
+                        if (map["unknown"] == 0 && cellValue != map["mines"]) return false
                         if (map["unknown"] == 0) continue@loop
-                        val probability = 100 / map["unknown"]!! * (cellValue - map["mines"]!!)
-
-                        if (indX != 0 && indY != 0 && arr[indX - 1][indY - 1] == '?') probArr[indX - 1][indY - 1]+=probability
-                        if (indX != 0 && arr[indX - 1][indY] == '?') probArr[indX - 1][indY]+=probability
-                        if (indX != 0 && indY != arr[0].size - 1 && arr[indX - 1][indY + 1] == '?') probArr[indX - 1][indY + 1]+=probability
-                        if (indY != arr[0].size - 1 && arr[indX][indY + 1] == '?') probArr[indX][indY + 1]+=probability
-                        if (indX != arr.size - 1 && indY != arr[0].size - 1 && arr[indX + 1][indY + 1] == '?') probArr[indX + 1][indY + 1]+=probability
-                        if (indX != arr.size - 1 && arr[indX + 1][indY] == '?') probArr[indX + 1][indY]+=probability
-                        if (indX != arr.size - 1 && indY != 0 && arr[indX + 1][indY - 1] == '?') probArr[indX + 1][indY - 1]+=probability
-                        if (indY != 0 && arr[indX][indY - 1] == '?') probArr[indX][indY - 1]+=probability
+                        if (cellValue == map["mines"]) return true
+                        if (map["unknown"] == cellValue - map["mines"]!!) return true
                     }
                 }
             }
         }
+        return true
+    }
+
+    private fun chooseAnyEmpty(indX: Int, indY: Int, arr: MutableList<CharArray>, flag: Flag): Step? {
+        if (indX != 0 && indY != 0 && arr[indX - 1][indY - 1] == '?') return Step(indX - 1, indY - 1, flag)
+        if (indX != 0 && arr[indX - 1][indY] == '?') return Step(indX - 1, indY, flag)
+        if (indX != 0 && indY != arr[0].size - 1 && arr[indX - 1][indY + 1] == '?') return Step(indX - 1, indY + 1, flag)
+        if (indY != arr[0].size - 1 && arr[indX][indY + 1] == '?') return Step(indX, indY + 1, flag)
+        if (indX != arr.size - 1 && indY != arr[0].size - 1 && arr[indX + 1][indY + 1] == '?') return Step(indX + 1, indY + 1, flag)
+        if (indX != arr.size - 1 && arr[indX + 1][indY] == '?') return Step(indX + 1, indY, flag)
+        if (indX != arr.size - 1 && indY != 0 && arr[indX + 1][indY - 1] == '?') return Step(indX + 1, indY - 1, flag)
+        if (indY != 0 && arr[indX][indY - 1] == '?') return Step(indX, indY - 1, flag)
         return null
     }
 
-    private fun makeStep(step: Step, visible: MutableList<CharArray>) {
+    private fun makeStep(step: Step, visible: MutableList<CharArray>, checkCase: Boolean) {
         when(step.flag) {
-            Flag.EMPTY -> visible[step.x][step.y] = "${Game.open(step.x, step.y)}".toCharArray()[0]
+            Flag.EMPTY -> {
+                if (checkCase) {
+                    val indX = step.x
+                    val indY = step.y
+                    val arr = visible
+                    val map = mutableMapOf("unknown" to 0, "mines" to 0)
+                    if (indX != 0 && indY != 0) countSurrounding(arr[indX - 1][indY - 1], map)
+                    if (indX != 0) countSurrounding(arr[indX - 1][indY], map)
+                    if (indX != 0 && indY != arr[0].size - 1) countSurrounding(arr[indX - 1][indY + 1], map)
+                    if (indY != arr[0].size - 1) countSurrounding(arr[indX][indY + 1], map)
+                    if (indX != arr.size - 1 && indY != arr[0].size - 1) countSurrounding(arr[indX + 1][indY + 1], map)
+                    if (indX != arr.size - 1) countSurrounding(arr[indX + 1][indY], map)
+                    if (indX != arr.size - 1 && indY != 0) countSurrounding(arr[indX + 1][indY - 1], map)
+                    if (indY != 0) countSurrounding(arr[indX][indY - 1], map)
+
+                    visible[step.x][step.y] = "${map["mines"]}".toCharArray()[0]
+                } else {
+                    visible[step.x][step.y] = "${Game.open(step.x, step.y)}".toCharArray()[0]
+                }
+            }
             Flag.MINE -> {
                 visible[step.x][step.y] = 'x'
                 foundMines++
@@ -212,7 +225,7 @@ class MineSweeper(board: String, nMines: Int) {
         }
     }
 
-    private fun checkClearField(visible: ArrayList<CharArray>): Boolean {
+    private fun checkClearField(visible: MutableList<CharArray>): Boolean {
         for (indX in visible.indices) {
             for (y in visible[indX].iterator()) if (y == '?') return false
         }
