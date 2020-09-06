@@ -156,9 +156,13 @@ class MineSweeperTest {
 
     @Test
     fun sampleTests() {
+        val startTime = System.currentTimeMillis()
         for (count in data.indices) {
             Game.newGame(data[count][1])
             makeAssertionAndDisplay(data[count][0], data[count][3], MineSweeper(data[count][2], Game.minesN).solve())
         }
+        val totalTime = System.currentTimeMillis() - startTime
+        println("-------------------------------------------")
+        println(totalTime)
     }
 }
