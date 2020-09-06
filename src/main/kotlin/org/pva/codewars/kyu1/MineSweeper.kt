@@ -7,6 +7,8 @@ class MineSweeper(board: String, nMines: Int) {
     private var foundMines = 0
 
     //todo SpeedUp
+    // make all possible steps at one time
+    // decrease number of probability combinations
 
     fun solve(): String {
         val vfArr = vfStrToArr(vfStr)
@@ -35,11 +37,24 @@ class MineSweeper(board: String, nMines: Int) {
                 if (y == '?') unknownCoords.add(Pair(indX, indY))
             }
         }
+        // Collect border cells
+        val borderCells = mutableListOf<Pair<Int, Int>>()
+        for (indX in vfArr.indices) {
+            for ((indY, y) in vfArr[indX].iterator().withIndex()) {
+                if (y != '?') continue
+                val map = mutableMapOf("unknown" to 0, "mines" to 0, "totalAround" to 0)
+                countCellStatistics(vfArr, indX, indY, map)
+                if (map["unknown"] == map["totalAround"]) continue
+                borderCells.add(Pair(indX, indY))
+            }
+        }
         // Collect probable combinations of mines dislocation
         val combinations = mutableListOf<IntArray>()
         combinations((0 until unknownCoords.size).toList().toIntArray(), nMns - foundMines, 0,
                 IntArray(nMns - foundMines) { 0 }, combinations)
         val successCase = mutableListOf<IntArray>()
+        // todo check and filter combinations to contains at least one border cell!
+        //
         for (re in combinations) {
             val caseField = mutableListOf<CharArray>()
             for (c in vfArr) {
@@ -111,7 +126,7 @@ class MineSweeper(board: String, nMines: Int) {
                     '?', 'x' -> continue@loop
                     else -> {
                         val cellValue = Character.getNumericValue(y)
-                        val map = mutableMapOf("unknown" to 0, "mines" to 0)
+                        val map = mutableMapOf("unknown" to 0, "mines" to 0, "totalAround" to 0)
                         if (indX != 0 && indY != 0) countSurrounding(arr[indX - 1][indY - 1], map)
                         if (indX != 0) countSurrounding(arr[indX - 1][indY], map)
                         if (indX != 0 && indY != arr[0].size - 1) countSurrounding(arr[indX - 1][indY + 1], map)
@@ -140,7 +155,7 @@ class MineSweeper(board: String, nMines: Int) {
                     '?', 'x' -> continue@loop
                     else -> {
                         val cellValue = Character.getNumericValue(y)
-                        val map = mutableMapOf("unknown" to 0, "mines" to 0)
+                        val map = mutableMapOf("unknown" to 0, "mines" to 0, "totalAround" to 0)
                         countCellStatistics(arr, indX, indY, map)
 
                         if (cellValue < map["mines"]!!) return false
@@ -182,7 +197,7 @@ class MineSweeper(board: String, nMines: Int) {
         when(step.flag) {
             Flag.EMPTY -> {
                 if (checkCase) {
-                    val map = mutableMapOf("unknown" to 0, "mines" to 0)
+                    val map = mutableMapOf("unknown" to 0, "mines" to 0, "totalAround" to 0)
                     countCellStatistics(visible, step.x, step.y, map)
                     visible[step.x][step.y] = "${map["mines"]}".toCharArray()[0]
                 } else {
@@ -201,6 +216,7 @@ class MineSweeper(board: String, nMines: Int) {
             '?' -> map["unknown"]?.let { map.put("unknown", it +1) }
             'x' -> map["mines"]?.let { map.put("mines", it + 1) }
         }
+        map["totalAround"]?.let { map.put("totalAround", it +1) }
     }
 
     private fun checkClearField(visible: MutableList<CharArray>): Boolean {
