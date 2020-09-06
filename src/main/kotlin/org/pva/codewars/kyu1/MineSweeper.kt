@@ -10,7 +10,7 @@ class MineSweeper(board: String, nMines: Int) {
 
     fun solve(): String {
         val vfArr = vfStrToArr(vfStr)
-        printVfArr(vfArr)
+//        printVfArr(vfArr)
         //****************** Simple algorithm ******************
         while (true) {
             var step = simpleAlgorithm(vfArr, false)
@@ -22,7 +22,7 @@ class MineSweeper(board: String, nMines: Int) {
             } else {
                 makeStep(step, vfArr,false)
             }
-            printVfArr(vfArr)
+//            printVfArr(vfArr)
         }
         return vfArrToStr(vfArr)
     }
@@ -209,10 +209,10 @@ class MineSweeper(board: String, nMines: Int) {
         return true
     }
 
-    private fun printVfArr(arr: MutableList<CharArray>) {
-        println(vfArrToStr(arr))
-        println("*".repeat(arr[0].size * 2 - 1))
-    }
+//    private fun printVfArr(arr: MutableList<CharArray>) {
+//        println(vfArrToStr(arr))
+//        println("*".repeat(arr[0].size * 2 - 1))
+//    }
 
     class Step(val x: Int, val y:Int, val flag:Flag)
 
