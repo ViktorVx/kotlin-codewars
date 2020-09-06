@@ -7,7 +7,6 @@ class MineSweeper(board: String, nMines: Int) {
     private var foundMines = 0
 
     //todo SpeedUp
-    // make all possible steps at one time
     // decrease number of probability combinations
 
     fun solve(): String {
