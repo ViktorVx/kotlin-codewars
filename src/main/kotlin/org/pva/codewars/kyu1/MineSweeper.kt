@@ -6,9 +6,6 @@ class MineSweeper(board: String, nMines: Int) {
     private val nMns = nMines
     private var foundMines = 0
 
-    //todo SpeedUp
-    // decrease number of probability combinations
-
     fun solve(): String {
         val vfArr = vfStrToArr(vfStr)
 //        printVfArr(vfArr)
@@ -52,7 +49,18 @@ class MineSweeper(board: String, nMines: Int) {
         combinations((0 until unknownCoords.size).toList().toIntArray(), nMns - foundMines, 0,
                 IntArray(nMns - foundMines) { 0 }, combinations)
         val successCase = mutableListOf<IntArray>()
-        // todo check and filter combinations to contains at least one border cell!
+        //check and filter combinations to contains at least one border cell
+        for (combination in combinations) {
+            val resultCombinations = mutableListOf<Pair<Int, Int>>()
+            var containsBorderCell = false
+            for (coord in combination) {
+                if (borderCells.contains(Pair(unknownCoords[coord].first, unknownCoords[coord].second))) {
+                    containsBorderCell = true
+                    break
+                }
+            }
+            if (!containsBorderCell) combinations.remove(combination)
+        }
         //
         for (re in combinations) {
             val caseField = mutableListOf<CharArray>()
